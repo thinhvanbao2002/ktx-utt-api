@@ -1,0 +1,13 @@
+import { Module } from '@nestjs/common';
+import { {{pascalCase name}}Controller } from './{{name}}.controller';
+import { {{pascalCase name}}Service } from './{{name}}.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { {{pascalCase name}} } from '../../entities/{{name}}.entity';
+
+@Module({
+imports: [TypeOrmModule.forFeature([{{pascalCase name}}])],
+controllers: [{{pascalCase name}}Controller],
+providers: [{{pascalCase name}}Service],
+exports: [{{pascalCase name}}Service],
+})
+export class {{pascalCase name}}Module {}

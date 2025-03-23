@@ -1,0 +1,33 @@
+import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import { {{pascalCase name}}Service } from './{{name}}.service';
+import { {{pascalCase name}} } from '../../entities/{{name}}.entity';
+
+@Controller('{{name}}')
+export class {{pascalCase name}}Controller {
+constructor(private readonly {{camelCase name}}Service: {{pascalCase name}}Service) {}
+
+@Get()
+findAll(): Promise<{{pascalCase name}}[]> {
+  return this.{{camelCase name}}Service.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: number): Promise<{{pascalCase name}}> {
+    return this.{{camelCase name}}Service.findOne(id);
+  }
+
+  @Post()
+  create(@Body() data: Partial<{{pascalCase name}}>): Promise<{{pascalCase name}}> {
+      return this.{{camelCase name}}Service.create(data);
+  }
+
+  @Put(':id')
+  update(@Param('id') id: number, @Body() data: Partial<{{pascalCase name}}>): Promise<{{pascalCase name}}> {
+      return this.{{camelCase name}}Service.update(id, data);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: number): Promise<void> {
+    return this.{{camelCase name}}Service.remove(id);
+  }
+}
