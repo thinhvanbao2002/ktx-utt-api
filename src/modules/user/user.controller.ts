@@ -11,13 +11,15 @@ import { UserService } from './user.service';
 import { User } from '../../entities/user.entity';
 import { Auth } from '@modules/auth/auth.decorator';
 import { UserRole } from './types/user.type';
+import { GenericController } from 'src/common/decorators/controller.decorator';
+import { ApiTags } from '@nestjs/swagger';
+import { CreateUserDto } from './dto/create-user.dto';
 
-@Controller('user')
+@GenericController('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  @Auth(UserRole.ADMIN, UserRole.CUSTOMER)
   async findAll(): Promise<User[]> {
     return this.userService.findAll();
   }
@@ -28,8 +30,8 @@ export class UserController {
   }
 
   @Post()
-  create(@Body() data: Partial<User>): Promise<User> {
-    return this.userService.create(data);
+  create(@Body() dto: CreateUserDto): Promise<User> {
+    return this.userService.create(dto);
   }
 
   @Put(':id')

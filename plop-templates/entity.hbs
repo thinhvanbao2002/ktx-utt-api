@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { 
+  Entity, 
+  Column, 
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn, 
+} from 'typeorm';
 
 @Entity()
 export class {{pascalCase name}} {
@@ -7,4 +14,13 @@ id: number;
 
 @Column({ type: 'varchar', length: 255 })
 name: string;
+
+@CreateDateColumn({ name: 'created_at' })
+created_at: Date;
+
+@UpdateDateColumn({ name: 'updated_at' })
+updated_at: Date;
+
+@DeleteDateColumn({ name: 'deleted_at', nullable: true })
+deleted_at: Date | null;
 }

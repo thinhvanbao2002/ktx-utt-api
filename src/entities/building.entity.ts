@@ -1,4 +1,3 @@
-import { UserRole } from '../modules/user/types/user.type';
 import {
   Entity,
   Column,
@@ -6,34 +5,23 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Floor } from './floor.entity';
 
-@Entity('user')
-export class User {
+@Entity()
+export class Building {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
-  @Column({ type: 'varchar', length: 10 })
-  phone: string;
-
   @Column({ type: 'varchar', length: 255 })
-  email: string;
+  address: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  password: string;
-
-  @Column({ type: 'varchar', length: 2000, nullable: true })
-  token: string;
-
-  @Column({
-    type: 'enum',
-    enum: UserRole,
-    default: UserRole.STUDENT,
-  })
-  role: UserRole;
+  @OneToMany(() => Floor, (floor) => floor.building)
+  floors: Floor[];
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
