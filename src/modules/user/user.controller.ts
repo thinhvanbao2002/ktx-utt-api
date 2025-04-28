@@ -1,14 +1,25 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from '../../entities/user.entity';
+import { Auth } from '@modules/auth/auth.decorator';
+import { UserRole } from './types/user.type';
 
 @Controller('user')
 export class UserController {
-constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
-@Get()
-findAll(): Promise<User[]> {
-  return this.userService.findAll();
+  @Get()
+  @Auth(UserRole.ADMIN, UserRole.CUSTOMER)
+  async findAll(): Promise<User[]> {
+    return this.userService.findAll();
   }
 
   @Get(':id')
@@ -18,12 +29,12 @@ findAll(): Promise<User[]> {
 
   @Post()
   create(@Body() data: Partial<User>): Promise<User> {
-      return this.userService.create(data);
+    return this.userService.create(data);
   }
 
   @Put(':id')
   update(@Param('id') id: number, @Body() data: Partial<User>): Promise<User> {
-      return this.userService.update(id, data);
+    return this.userService.update(id, data);
   }
 
   @Delete(':id')

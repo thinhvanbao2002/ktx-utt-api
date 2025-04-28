@@ -10,21 +10,21 @@ constructor(
 private repository: Repository<{{pascalCase name}}>,
   ) {}
 
-  findAll(): Promise<{{pascalCase name}}[]> {
-    return this.repository.find();
+  async findAll(): Promise<{{pascalCase name}}[]> {
+    return await this.repository.find();
   }
 
-  findOne(id: number): Promise<{{pascalCase name}}> {
-    return this.repository.findOne({ where: { id } });
+  async findOne(id: number): Promise<{{pascalCase name}}> {
+    return await this.repository.findOne({ where: { id } });
   } 
 
-  create(data: Partial<{{pascalCase name}}>): Promise<{{pascalCase name}}> {
-      return this.repository.save(data);
+  async create(data: Partial<{{pascalCase name}}>): Promise<{{pascalCase name}}> {
+      return await this.repository.save(data);
   }
 
   async update(id: number, data: Partial<{{pascalCase name}}>): Promise<{{pascalCase name}}> {
       await this.repository.update(id, data);
-      return this.findOne(id);
+      return await this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {

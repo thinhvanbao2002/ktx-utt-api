@@ -7,27 +7,27 @@ export class {{pascalCase name}}Controller {
 constructor(private readonly {{camelCase name}}Service: {{pascalCase name}}Service) {}
 
 @Get()
-findAll(): Promise<{{pascalCase name}}[]> {
-  return this.{{camelCase name}}Service.findAll();
+  async findAll(): Promise<{{pascalCase name}}[]> {
+  return await this.{{camelCase name}}Service.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<{{pascalCase name}}> {
-    return this.{{camelCase name}}Service.findOne(id);
+  async findOne(@Param('id') id: number): Promise<{{pascalCase name}}> {
+    return await this.{{camelCase name}}Service.findOne(id);
   }
 
   @Post()
-  create(@Body() data: Partial<{{pascalCase name}}>): Promise<{{pascalCase name}}> {
-      return this.{{camelCase name}}Service.create(data);
+  async create(@Body() data: Partial<{{pascalCase name}}>): Promise<{{pascalCase name}}> {
+      return await this.{{camelCase name}}Service.create(data);
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() data: Partial<{{pascalCase name}}>): Promise<{{pascalCase name}}> {
-      return this.{{camelCase name}}Service.update(id, data);
+  async update(@Param('id') id: number, @Body() data: Partial<{{pascalCase name}}>): Promise<{{pascalCase name}}> {
+      return await this.{{camelCase name}}Service.update(id, data);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number): Promise<void> {
-    return this.{{camelCase name}}Service.remove(id);
+  async remove(@Param('id') id: number): Promise<void> {
+    return await this.{{camelCase name}}Service.remove(id);
   }
 }
