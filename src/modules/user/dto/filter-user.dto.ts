@@ -1,22 +1,21 @@
 import { IsString, IsNotEmpty } from 'class-validator';
 import {
   EmailField,
+  EmailFieldOptional,
   EnumField,
   StringField,
   StringFieldOptional,
 } from 'src/common/decorators/field.decorators';
 import { UserRole } from '../types/user.type';
+import { PageOptionsDto } from 'src/common/dto/page-option.dto';
 
-export class CreateUserDto {
-  @StringField()
+export class FilterUserDto extends PageOptionsDto {
+  @StringFieldOptional()
   name: string;
 
-  @StringField()
+  @StringFieldOptional()
   phone: string;
 
-  @EmailField()
+  @EmailFieldOptional()
   email: string;
-
-  @StringField()
-  password: string;
 }

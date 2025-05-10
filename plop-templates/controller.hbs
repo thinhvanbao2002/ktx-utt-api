@@ -1,5 +1,6 @@
 import { Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
 import { GenericController } from 'src/common/decorators/controller.decorator';
+import { PageDto } from 'src/common/dto/page.dto';
 import { {{pascalCase name}}Service } from './{{name}}.service';
 import { {{pascalCase name}} } from '../../entities/{{name}}.entity';
 
@@ -8,9 +9,10 @@ export class {{pascalCase name}}Controller {
 constructor(private readonly {{camelCase name}}Service: {{pascalCase name}}Service) {}
 
 @Get()
-  async findAll(): Promise<{{pascalCase name}}[]> {
+async findAll(): Promise<PageDto<{{pascalCase name}}>> {
   return await this.{{camelCase name}}Service.findAll();
   }
+
 
   @Get(':id')
   async findOne(@Param('id') id: number): Promise<{{pascalCase name}}> {

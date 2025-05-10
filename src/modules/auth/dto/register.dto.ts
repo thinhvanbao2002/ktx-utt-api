@@ -5,9 +5,8 @@ import {
   StringField,
   StringFieldOptional,
 } from 'src/common/decorators/field.decorators';
-import { UserRole } from '../types/user.type';
 
-export class CreateUserDto {
+export class RegisterDto {
   @StringField()
   name: string;
 

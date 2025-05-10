@@ -1,3 +1,4 @@
+import { CommonStatus } from '../common/types/common.type';
 import { UserRole } from '../modules/user/types/user.type';
 import {
   Entity,
@@ -34,6 +35,13 @@ export class User {
     default: UserRole.STUDENT,
   })
   role: UserRole;
+
+  @CreateDateColumn({
+    type: 'enum',
+    enum: CommonStatus,
+    default: CommonStatus.ACTIVE,
+  })
+  status: CommonStatus;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

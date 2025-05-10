@@ -31,7 +31,7 @@ import {
 } from 'class-validator';
 import { DATE_FORMAT_STRING } from '../helpers/date.helper';
 import { supportedLanguageCount } from '../types/language-code';
-import _ from 'lodash';
+import * as _ from 'lodash';
 
 import { ApiEnumProperty, ApiUUIDProperty } from './property.decorators';
 import {

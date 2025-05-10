@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { PageDto } from 'src/common/dto/page.dto';
 import { {{pascalCase name}} } from '../../entities/{{name}}.entity';
 
 @Injectable()
@@ -10,7 +11,7 @@ constructor(
 private repository: Repository<{{pascalCase name}}>,
   ) {}
 
-  async findAll(): Promise<{{pascalCase name}}[]> {
+  async findAll(): Promise<PageDto<{{pascalCase name}}>> {
     return await this.repository.find();
   }
 

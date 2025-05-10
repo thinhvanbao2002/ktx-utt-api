@@ -6,6 +6,10 @@ import { AuthGuard } from './auth.guard';
 import { UserModule } from '@modules/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { UserController } from '@modules/user/user.controller';
+import { UserService } from '@modules/user/user.service';
 
 @Module({
   imports: [
@@ -16,11 +20,12 @@ import { User } from 'src/entities/user.entity';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '1h' },
+        signOptions: { expiresIn: '30d' },
       }),
     }),
   ],
-  providers: [JwtStrategy, AuthGuard],
-  exports: [JwtModule, AuthGuard],
+  controllers: [AuthController, UserController],
+  providers: [JwtStrategy, AuthGuard, AuthService],
+  exports: [JwtModule, AuthGuard, AuthService],
 })
 export class AuthModule {}
