@@ -1,4 +1,4 @@
-import { Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import { Get, Post, Body, Param, Delete, Put,Patch } from '@nestjs/common';
 import { GenericController } from 'src/common/decorators/controller.decorator';
 import { PageDto } from 'src/common/dto/page.dto';
 import { {{pascalCase name}}Service } from './{{name}}.service';
@@ -24,7 +24,7 @@ async findAll(): Promise<PageDto<{{pascalCase name}}>> {
       return await this.{{camelCase name}}Service.create(data);
   }
 
-  @Put(':id')
+  @Patch(':id')
   async update(@Param('id') id: number, @Body() data: Partial<{{pascalCase name}}>): Promise<{{pascalCase name}}> {
       return await this.{{camelCase name}}Service.update(id, data);
   }

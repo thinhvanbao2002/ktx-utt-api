@@ -3,11 +3,13 @@ import {
   EmailField,
   EmailFieldOptional,
   EnumField,
+  EnumFieldOptional,
   StringField,
   StringFieldOptional,
 } from 'src/common/decorators/field.decorators';
 import { UserRole } from '../types/user.type';
 import { PageOptionsDto } from 'src/common/dto/page-option.dto';
+import { CommonStatus } from 'src/common/types/common.type';
 
 export class FilterUserDto extends PageOptionsDto {
   @StringFieldOptional()
@@ -18,4 +20,7 @@ export class FilterUserDto extends PageOptionsDto {
 
   @EmailFieldOptional()
   email: string;
+
+  @EnumFieldOptional(() => CommonStatus)
+  status: CommonStatus;
 }

@@ -1,5 +1,8 @@
 import { AuthModule } from '@modules/auth/auth.module';
+import { BuildingModule } from '@modules/building/building.module';
+import { DeviceModule } from '@modules/device/device.module';
 import { FloorModule } from '@modules/floor/floor.module';
+import { RoomTypeModule } from '@modules/room_type/room_type.module';
 import { UserModule } from '@modules/user/user.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -22,6 +25,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     AuthModule,
     UserModule,
     FloorModule,
+    BuildingModule,
+    RoomTypeModule,
+    DeviceModule,
   ],
 })
 export class AppModule {}

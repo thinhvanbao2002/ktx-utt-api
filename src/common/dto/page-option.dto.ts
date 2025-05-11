@@ -1,4 +1,5 @@
 import {
+  DateFieldOptional,
   EnumFieldOptional,
   NumberFieldOptional,
   StringFieldOptional,
@@ -39,4 +40,10 @@ export class PageOptionsDto {
   static skip(p: PageOptionsDto): number {
     return (p.page - 1) * p.take;
   }
+
+  @DateFieldOptional()
+  from_date?: Date;
+
+  @DateFieldOptional()
+  to_date?: Date;
 }

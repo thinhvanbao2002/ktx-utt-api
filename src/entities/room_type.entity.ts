@@ -5,31 +5,21 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
-  OneToMany,
 } from 'typeorm';
-import { Floor } from './floor.entity';
-import { CommonStatus } from '../common/types/common.type';
 
 @Entity()
-export class Building {
+export class RoomType {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  address: string;
+  @Column({ type: 'int' })
+  price: number;
 
-  @Column({ type: 'varchar', length: 2000 })
-  note: string;
-
-  @CreateDateColumn({
-    type: 'enum',
-    enum: CommonStatus,
-    default: CommonStatus.ACTIVE,
-  })
-  status: CommonStatus;
+  @Column({ type: 'int' })
+  max_student: number;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

@@ -1,16 +1,16 @@
 import { IsString, IsNotEmpty } from 'class-validator';
 import {
+  NumberField,
   StringField,
-  StringFieldOptional,
 } from 'src/common/decorators/field.decorators';
 
-export class CreateBuildingDto {
+export class CreateRoomTypeDto {
   @StringField()
   name: string;
 
-  @StringField()
-  address: string;
+  @NumberField()
+  price: number;
 
-  @StringFieldOptional()
-  note: string;
+  @NumberField()
+  max_student: number;
 }

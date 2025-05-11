@@ -5,11 +5,13 @@ import {
   NotFoundException,
   Query,
 } from '@nestjs/common';
+import { Brackets } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Like, Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import * as moment from 'moment'; // đảm bảo đã cài moment
 import { FilterUserDto } from './dto/filter-user.dto';
 import { PageDto } from 'src/common/dto/page.dto';
 import { PageMetaDto } from 'src/common/dto/page-meta.dto';
@@ -22,19 +24,54 @@ export class UserService {
   ) {}
 
   async findAll(@Query() dto: FilterUserDto): Promise<PageDto<User>> {
-    const { page, take, q, name, phone, email } = dto;
+    const { take, skip: skipRaw, q, status, from_date, to_date } = dto;
+    const skip = parseInt(skipRaw as any, 10) || 0;
 
-    const where: FindOptionsWhere<User> = {};
+    const query = this.repository
+      .createQueryBuilder('user')
+      .select([
+        'user.id',
+        'user.name',
+        'user.email',
+        'user.phone',
+        'user.role',
+        'user.status',
+        'user.created_at',
+      ]);
 
-    if (name) where.name = Like(`%${name}%`);
-    if (email) where.email = Like(`%${email}%`);
-    if (phone) where.phone = Like(`%${phone}%`);
+    // Tìm kiếm theo từ khóa (q)
+    if (q) {
+      const keyword = `%${q}%`;
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where('user.phone LIKE :keyword', { keyword })
+            .orWhere('user.name LIKE :keyword', { keyword })
+            .orWhere('user.email LIKE :keyword', { keyword });
+        }),
+      );
+    }
 
-    const [users, count] = await this.repository.findAndCount({
-      where,
-      skip: (page - 1) * take,
-      take,
-    });
+    // Lọc theo status
+    if (status) {
+      query.andWhere('user.status = :status', { status });
+    }
+
+    // Lọc theo from_date và to_date
+    if (from_date) {
+      const fromDateStart = moment(from_date).startOf('day').toDate();
+      query.andWhere('user.created_at >= :fromDate', {
+        fromDate: fromDateStart,
+      });
+    }
+
+    if (to_date) {
+      const toDateEnd = moment(to_date).endOf('day').toDate();
+      query.andWhere('user.created_at <= :toDate', { toDate: toDateEnd });
+    }
+
+    query.skip(skip).take(take);
+
+    const [users, count] = await query.getManyAndCount();
 
     return new PageDto(
       users,
