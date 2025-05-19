@@ -19,13 +19,14 @@ private repository: Repository<{{pascalCase name}}>,
     return await this.repository.findOne({ where: { id } });
   } 
 
-  async create(data: Partial<{{pascalCase name}}>): Promise<{{pascalCase name}}> {
-      return await this.repository.save(data);
+  async create(dto: {{pascalCase name}}Dto): Promise<{{pascalCase name}}> {
+    const entity = this.repository.create(dto);
+    return await this.repository.save(entity);
   }
 
-  async update(id: number, data: Partial<{{pascalCase name}}>): Promise<{{pascalCase name}}> {
-      await this.repository.update(id, data);
-      return await this.findOne(id);
+  async update(id: number, dto: {{pascalCase name}}Dto): Promise<{{pascalCase name}}> {
+    await this.repository.update(id, dto);
+    return await this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {

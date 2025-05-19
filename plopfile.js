@@ -36,6 +36,11 @@ module.exports = function (plop) {
       },
       {
         type: 'add',
+        path: 'src/modules/{{name}}/dto/filter-{{name}}.dto.ts',
+        templateFile: 'plop-templates/filterDto.hbs',
+      },
+      {
+        type: 'add',
         path: 'src/entities/{{name}}.entity.ts',
         templateFile: 'plop-templates/entity.hbs',
       },

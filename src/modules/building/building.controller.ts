@@ -21,7 +21,6 @@ export class BuildingController {
 
   @Post()
   async create(@Body() dto: CreateBuildingDto): Promise<Building> {
-    console.log('🚀 ~ BuildingController ~ create ~ dto:', dto);
     return await this.buildingService.create(dto);
   }
 

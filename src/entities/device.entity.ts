@@ -5,7 +5,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { RoomDevice } from './room_device.entity';
 
 @Entity()
 export class Device {
@@ -17,6 +19,9 @@ export class Device {
 
   @Column({ type: 'varchar', length: 255 })
   name: string;
+
+  @OneToMany(() => RoomDevice, (roomDevice) => roomDevice.device)
+  room_devices: RoomDevice[];
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

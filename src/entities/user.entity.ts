@@ -36,7 +36,7 @@ export class User {
   })
   role: UserRole;
 
-  @CreateDateColumn({
+  @Column({
     type: 'enum',
     enum: CommonStatus,
     default: CommonStatus.ACTIVE,

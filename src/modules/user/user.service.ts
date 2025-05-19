@@ -24,8 +24,11 @@ export class UserService {
   ) {}
 
   async findAll(@Query() dto: FilterUserDto): Promise<PageDto<User>> {
-    const { take, skip: skipRaw, q, status, from_date, to_date } = dto;
-    const skip = parseInt(skipRaw as any, 10) || 0;
+    const { take, skip: skipRaw, q, status, from_date, to_date, page } = dto;
+    
+    const pageNumber = parseInt(page as any, 10) || 1;
+    const itemsPerPage = parseInt(take as any, 10) || 10;
+    const skip = (pageNumber - 1) * itemsPerPage;
 
     const query = this.repository
       .createQueryBuilder('user')
@@ -51,12 +54,10 @@ export class UserService {
       );
     }
 
-    // Lọc theo status
     if (status) {
       query.andWhere('user.status = :status', { status });
     }
 
-    // Lọc theo from_date và to_date
     if (from_date) {
       const fromDateStart = moment(from_date).startOf('day').toDate();
       query.andWhere('user.created_at >= :fromDate', {
@@ -69,9 +70,11 @@ export class UserService {
       query.andWhere('user.created_at <= :toDate', { toDate: toDateEnd });
     }
 
-    query.skip(skip).take(take);
+    query.skip(skip).take(itemsPerPage);
 
     const [users, count] = await query.getManyAndCount();
+    
+    console.log("🚀 ~ UserService ~ findAll ~ users:", users)
 
     return new PageDto(
       users,
@@ -99,7 +102,7 @@ export class UserService {
     });
 
     if (checkEmail) {
-      throw new NotFoundException('Email không tồn tại!');
+      throw new NotFoundException('Email đã tồn tại!');
     }
 
     const SALT = bcrypt.genSaltSync();

@@ -5,28 +5,39 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
-  OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
-import { Floor } from './floor.entity';
 import { Room } from './room.entity';
+import { Device } from './device.entity';
 import { CommonStatus } from '../common/types/common.type';
 
 @Entity()
-export class Building {
+export class RoomDevice {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 255 })
-  name: string;
+  @Column()
+  room_id: number;
 
-  @Column({ type: 'varchar', length: 255 })
-  address: string;
+  @ManyToOne(() => Room, (room) => room.room_devices, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'room_id' })
+  room: Room;
 
-  @Column({ type: 'varchar', length: 2000 })
-  note: string;
+  @Column()
+  device_id: number;
 
-  @OneToMany(() => Room, room => room.building)
-  rooms: Room[];
+  @ManyToOne(() => Device, (device) => device.room_devices, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'device_id' })
+  device: Device;
+
+  @Column({ type: 'int', default: 1 })
+  quantity: number;
+
+  @Column({ type: 'text', nullable: true })
+  description: string;
 
   @Column({
     type: 'enum',

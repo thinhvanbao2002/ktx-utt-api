@@ -5,7 +5,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Room } from './room.entity';
 
 @Entity()
 export class RoomType {
@@ -20,6 +22,9 @@ export class RoomType {
 
   @Column({ type: 'int' })
   max_student: number;
+
+  @OneToMany(() => Room, room => room.room_type_id)
+  rooms: Room[];
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
