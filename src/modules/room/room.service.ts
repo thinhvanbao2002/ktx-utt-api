@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { PageDto } from 'src/common/dto/page.dto';
 import { Room } from '../../entities/room.entity';
 import { FilterRoomDto } from './dto/filter-room.dto';
@@ -8,12 +8,17 @@ import { PageMetaDto } from 'src/common/dto/page-meta.dto';
 import { Brackets } from 'typeorm';
 import { CreateRoomDto } from './dto/create-room.dto';
 import * as moment from 'moment';
+import { UpdateRoomDto } from './dto/update-room.dto';
+import { RoomDevice } from 'src/entities/room_device.entity';
 
 @Injectable()
 export class RoomService {
   constructor(
     @InjectRepository(Room)
     private repository: Repository<Room>,
+    @InjectRepository(RoomDevice)
+    private roomDeviceRepository: Repository<RoomDevice>,
+    private readonly dataSource: DataSource,
   ) {}
 
   async findAll(query: FilterRoomDto): Promise<PageDto<Room>> {
@@ -126,13 +131,81 @@ export class RoomService {
   }
 
   async create(dto: CreateRoomDto): Promise<Room> {
-    return await this.repository.save(dto);
+    const { device_ids, ...roomData } = dto;
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // 1. Tạo room
+      const room = await queryRunner.manager.save(Room, roomData);
+
+      const roomDevices = device_ids.map((device_id) => {
+        return this.roomDeviceRepository.create({
+          room_id: room.id,
+          device_id,
+        });
+      });
+
+      await queryRunner.manager.save(RoomDevice, roomDevices);
+
+      await queryRunner.commitTransaction();
+
+      return room;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
-  async update(id: number, data: Partial<Room>): Promise<Room> {
-    const room = await this.findOne(id);
-    Object.assign(room, data);
-    return await this.repository.save(room);
+  async update(id: number, data: UpdateRoomDto): Promise<Room> {
+    const { device_ids, ...roomData } = data;
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // 1. Tìm room và cập nhật thông tin cơ bản
+      const room = await this.repository.findOneByOrFail({ id });
+      Object.assign(room, roomData);
+      await queryRunner.manager.save(Room, room);
+
+      if (device_ids && device_ids.length > 0) {
+        // 2. Lấy danh sách device_id đã có trong room_device
+        const existingRoomDevices = await this.roomDeviceRepository.find({
+          where: { room_id: id },
+        });
+
+        const existingDeviceIds = new Set(
+          existingRoomDevices.map((rd) => rd.device_id),
+        );
+
+        // 3. Lọc ra những device_id chưa tồn tại để thêm
+        const newDeviceIds = device_ids.filter(
+          (id) => !existingDeviceIds.has(id),
+        );
+
+        // 4. Tạo các bản ghi mới
+        const newRoomDevices = this.roomDeviceRepository.create(
+          newDeviceIds.map((device_id) => ({ room_id: id, device_id })),
+        );
+
+        // 5. Chèn các bản ghi mới
+        await queryRunner.manager.save(RoomDevice, newRoomDevices);
+      }
+
+      await queryRunner.commitTransaction();
+      return room;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async remove(id: number): Promise<void> {

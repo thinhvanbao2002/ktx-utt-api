@@ -14,6 +14,7 @@ import { RoomService } from './room.service';
 import { Room } from '../../entities/room.entity';
 import { FilterRoomDto } from './dto/filter-room.dto';
 import { CreateRoomDto } from './dto/create-room.dto';
+import { UpdateRoomDto } from './dto/update-room.dto';
 
 @GenericController('room')
 export class RoomController {
@@ -37,9 +38,9 @@ export class RoomController {
   @Patch(':id')
   async update(
     @Param('id') id: number,
-    @Body() data: Partial<Room>,
+    @Body() dto: UpdateRoomDto,
   ): Promise<Room> {
-    return await this.roomService.update(id, data);
+    return await this.roomService.update(id, dto);
   }
 
   @Delete(':id')
