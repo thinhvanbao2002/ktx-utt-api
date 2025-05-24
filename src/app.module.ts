@@ -13,10 +13,21 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoomDevice } from './entities/room_device.entity';
 import { Room } from './entities/room.entity';
 import { RoomDeviceModule } from '@modules/room_device/room_device.module';
+import { RoomPhoto } from './entities/room_photo.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { AdminDashboardModule } from './modules/admin-dashboard/admin-dashboard.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DB_HOST,
@@ -36,6 +47,8 @@ import { RoomDeviceModule } from '@modules/room_device/room_device.module';
     RoomModule,
     UploadModule,
     RoomDeviceModule,
+    RoomPhoto,
+    AdminDashboardModule,
   ],
 })
 export class AppModule {}

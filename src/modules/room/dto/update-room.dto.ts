@@ -20,7 +20,7 @@ export class UpdateRoomDto {
 
   @IsArray()
   @ApiProperty()
-  device_ids: [];
+  devices?: number[];
 
   @IsArray()
   @ApiProperty()

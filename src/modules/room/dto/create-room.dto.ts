@@ -20,7 +20,7 @@ export class CreateRoomDto {
 
   @IsArray()
   @ApiProperty()
-  device_ids: [];
+  devices: [];
 
   @IsArray()
   @ApiProperty()

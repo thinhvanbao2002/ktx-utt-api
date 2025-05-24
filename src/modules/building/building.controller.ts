@@ -10,7 +10,7 @@ export class BuildingController {
   constructor(private readonly buildingService: BuildingService) {}
 
   @Get()
-  async findAll(): Promise<Building[]> {
+  async findAll(): Promise<{}> {
     return await this.buildingService.findAll();
   }
 

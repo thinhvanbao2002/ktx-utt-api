@@ -10,6 +10,8 @@ import { CreateRoomDto } from './dto/create-room.dto';
 import * as moment from 'moment';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { RoomDevice } from 'src/entities/room_device.entity';
+import { plainToInstance } from 'class-transformer';
+import { RoomPhoto } from 'src/entities/room_photo.entity';
 
 @Injectable()
 export class RoomService {
@@ -18,6 +20,8 @@ export class RoomService {
     private repository: Repository<Room>,
     @InjectRepository(RoomDevice)
     private roomDeviceRepository: Repository<RoomDevice>,
+    @InjectRepository(RoomPhoto)
+    private roomPhotoRepository: Repository<RoomPhoto>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -44,6 +48,7 @@ export class RoomService {
       .leftJoinAndSelect('room.room_type', 'room_type')
       .leftJoinAndSelect('room.room_devices', 'room_devices')
       .leftJoinAndSelect('room_devices.device', 'device')
+      .leftJoinAndSelect('room.room_photos', 'room_photos') // 👈 Join thêm ảnh
       .select([
         'room.id',
         'room.room_number',
@@ -68,6 +73,10 @@ export class RoomService {
         'device.id',
         'device.device_code',
         'device.name',
+
+        'room_photos.id', // 👈 Các trường cần lấy từ room_photos
+        'room_photos.url',
+        'room_photos.created_at',
       ]);
 
     // Search by keyword
@@ -108,6 +117,7 @@ export class RoomService {
     }
 
     queryBuilder.skip(skip).take(itemsPerPage);
+    queryBuilder.orderBy('room.created_at', 'DESC');
 
     const [rooms, count] = await queryBuilder.getManyAndCount();
 
@@ -131,7 +141,8 @@ export class RoomService {
   }
 
   async create(dto: CreateRoomDto): Promise<Room> {
-    const { device_ids, ...roomData } = dto;
+    const { devices, room_photos, ...roomData } = dto;
+    console.log("🚀 ~ RoomService ~ create ~ dto:", dto)
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -141,17 +152,29 @@ export class RoomService {
       // 1. Tạo room
       const room = await queryRunner.manager.save(Room, roomData);
 
-      const roomDevices = device_ids.map((device_id) => {
-        return this.roomDeviceRepository.create({
-          room_id: room.id,
-          device_id,
+      // 2. Xử lý devices
+      if (devices && devices.length > 0) {
+        const roomDevices = devices.map((device_id) => {
+          return this.roomDeviceRepository.create({
+            room_id: room.id,
+            device_id,
+          });
         });
-      });
+        await queryRunner.manager.save(RoomDevice, roomDevices);
+      }
 
-      await queryRunner.manager.save(RoomDevice, roomDevices);
+      // 3. Xử lý room_photos
+      if (room_photos && room_photos.length > 0) {
+        const roomPhotos = room_photos.map((item: { url: string }) => {
+          return this.roomPhotoRepository.create({
+            room_id: room.id,
+            url: item.url,
+          });
+        });
+        await queryRunner.manager.save(RoomPhoto, roomPhotos);
+      }
 
       await queryRunner.commitTransaction();
-
       return room;
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -162,7 +185,12 @@ export class RoomService {
   }
 
   async update(id: number, data: UpdateRoomDto): Promise<Room> {
-    const { device_ids, ...roomData } = data;
+    const { devices, room_photos, ...roomData } = data;
+
+    const updated_photos = room_photos.map((photo: {url: string}) => ({
+      ...photo,
+      url: photo.url.replace(`${process.env.API_BASE_URL}/`, ''),
+    }));
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -174,28 +202,52 @@ export class RoomService {
       Object.assign(room, roomData);
       await queryRunner.manager.save(Room, room);
 
-      if (device_ids && device_ids.length > 0) {
-        // 2. Lấy danh sách device_id đã có trong room_device
-        const existingRoomDevices = await this.roomDeviceRepository.find({
+      // 2. Xử lý devices
+      if (devices) {
+        // Lấy danh sách RoomDevice hiện có của room
+        const existingRoomDevices: RoomDevice[] = await this.roomDeviceRepository.find({
           where: { room_id: id },
         });
 
         const existingDeviceIds = new Set(
-          existingRoomDevices.map((rd) => rd.device_id),
+          existingRoomDevices.map((rd: any) => rd.device_id),
         );
 
-        // 3. Lọc ra những device_id chưa tồn tại để thêm
-        const newDeviceIds = device_ids.filter(
-          (id) => !existingDeviceIds.has(id),
+        // Lọc ra các device_id cần thêm mới
+        const newDeviceIds = devices.filter(
+          (device_id) => !existingDeviceIds.has(device_id),
         );
 
-        // 4. Tạo các bản ghi mới
-        const newRoomDevices = this.roomDeviceRepository.create(
-          newDeviceIds.map((device_id) => ({ room_id: id, device_id })),
-        );
+        // Lọc ra các RoomDevice cần xóa
+        const removedRoomDeviceIds = existingRoomDevices
+          .filter((rd) => !devices.includes(rd.device_id))
+          .map((rd) => rd.id as number);
 
-        // 5. Chèn các bản ghi mới
-        await queryRunner.manager.save(RoomDevice, newRoomDevices);
+        if (removedRoomDeviceIds.length > 0) {
+          await queryRunner.manager.delete(RoomDevice, removedRoomDeviceIds);
+        }
+
+        // Tạo các RoomDevice mới
+        if (newDeviceIds.length > 0) {
+          const newRoomDevices = this.roomDeviceRepository.create(
+            newDeviceIds.map((device_id) => ({ room_id: id, device_id })),
+          );
+          await queryRunner.manager.save(RoomDevice, newRoomDevices);
+        }
+      }
+
+      if (room_photos) {
+        // Xóa tất cả ảnh cũ của room
+        await queryRunner.manager.delete(RoomPhoto, { room_id: id });
+
+        // Thêm lại các ảnh mới
+        const newRoomPhotos = this.roomPhotoRepository.create(
+          updated_photos.map((photo) => ({
+            room_id: id,
+            url: photo.url,
+          }))
+        );
+        await queryRunner.manager.save(RoomPhoto, newRoomPhotos);
       }
 
       await queryRunner.commitTransaction();

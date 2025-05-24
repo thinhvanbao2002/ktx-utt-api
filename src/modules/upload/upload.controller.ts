@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-
+import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 import { GenericController } from 'src/common/decorators/controller.decorator';
 import {
@@ -16,6 +16,7 @@ import {
 
 @GenericController('uploads')
 export class UploadController {
+  constructor(private readonly configService: ConfigService) {}
   @Post('image')
   @UseInterceptors(
     FileInterceptor('image', {
@@ -31,8 +32,9 @@ export class UploadController {
     }),
   )
   public uploadImage(@UploadedFile() image: Express.Multer.File) {
+    const baseUrl = this.configService.get<string>('BASE_API_URL');
     const relativeUrl = `uploads/image${image.filename}`;
-    const absoluteUrl = `${process.env.API_BASE_URL}/${relativeUrl}`;
+    const absoluteUrl = `${baseUrl}/${relativeUrl}`;
 
     const data = {
       absoluteUrl,
@@ -59,9 +61,10 @@ export class UploadController {
     }),
   )
   public uploadMultipleImages(@UploadedFiles() images: Express.Multer.File[]) {
+    const baseUrl = this.configService.get<string>('BASE_API_URL');
     const uploadedImages = images.map((image) => {
       const relativeUrl = `uploads/image${image.filename}`;
-      const absoluteUrl = `${process.env.API_BASE_URL}/api/v1/${relativeUrl}`;
+      const absoluteUrl = `${baseUrl}/api/v1/${relativeUrl}`;
 
       return {
         absoluteUrl,

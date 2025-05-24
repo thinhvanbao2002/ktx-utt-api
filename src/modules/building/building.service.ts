@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { Building } from '../../entities/building.entity';
 import { CreateBuildingDto } from './dto/create-building.dto';
 import { UpdateBuildingDto } from './dto/update-building.dto';
+import { PageDto } from 'src/common/dto/page.dto';
+import { PageMetaDto } from 'src/common/dto/page-meta.dto';
 
 @Injectable()
 export class BuildingService {
@@ -12,8 +14,10 @@ export class BuildingService {
     private repository: Repository<Building>,
   ) {}
 
-  async findAll(): Promise<Building[]> {
-    return await this.repository.find();
+  async findAll(): Promise<object> {
+    const [buildings, count] = await this.repository.findAndCount();
+
+    return { data: buildings };
   }
 
   async findOne(id: number): Promise<Building> {

@@ -14,6 +14,7 @@ import { Building } from './building.entity';
 import { RoomType } from './room_type.entity';
 import { RoomDevice } from './room_device.entity';
 import { RoomStatus } from '../modules/room/types/room.type';
+import { RoomPhoto } from './room_photo.entity';
 
 @Entity()
 export class Room {
@@ -24,7 +25,7 @@ export class Room {
   room_number: string;
 
   @Column({ type: 'int', default: 0 })
-  current_capacity: string;
+  current_capacity: number;
 
   @Column()
   building_id: number;
@@ -52,6 +53,9 @@ export class Room {
 
   @OneToMany(() => RoomDevice, (roomDevice) => roomDevice.room)
   room_devices: RoomDevice[];
+
+  @OneToMany(() => RoomPhoto, (roomPhoto) => roomPhoto.room, { eager: true })
+  room_photos: RoomPhoto[];
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

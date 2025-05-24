@@ -7,6 +7,8 @@ import {
   Put,
   Patch,
   Query,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { GenericController } from 'src/common/decorators/controller.decorator';
 import { PageDto } from 'src/common/dto/page.dto';
@@ -21,6 +23,7 @@ export class RoomController {
   constructor(private readonly roomService: RoomService) {}
 
   @Get()
+  @UseInterceptors(ClassSerializerInterceptor)
   async findAll(@Query() query: FilterRoomDto): Promise<PageDto<Room>> {
     return await this.roomService.findAll(query);
   }

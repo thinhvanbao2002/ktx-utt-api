@@ -22,6 +22,11 @@ import { PageDto } from 'src/common/dto/page.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get('/count-student')
+  countStudent(): Promise<number> {
+    return this.userService.countStudent();
+  }
+
   @Get()
   async findAll(@Query() query: FilterUserDto): Promise<PageDto<User>> {
     return this.userService.findAll(query);

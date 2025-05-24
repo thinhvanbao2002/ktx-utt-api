@@ -15,6 +15,7 @@ import * as moment from 'moment'; // đảm bảo đã cài moment
 import { FilterUserDto } from './dto/filter-user.dto';
 import { PageDto } from 'src/common/dto/page.dto';
 import { PageMetaDto } from 'src/common/dto/page-meta.dto';
+import { UserRole } from './types/user.type';
 
 @Injectable()
 export class UserService {
@@ -25,7 +26,7 @@ export class UserService {
 
   async findAll(@Query() dto: FilterUserDto): Promise<PageDto<User>> {
     const { take, skip: skipRaw, q, status, from_date, to_date, page } = dto;
-    
+
     const pageNumber = parseInt(page as any, 10) || 1;
     const itemsPerPage = parseInt(take as any, 10) || 10;
     const skip = (pageNumber - 1) * itemsPerPage;
@@ -73,8 +74,8 @@ export class UserService {
     query.skip(skip).take(itemsPerPage);
 
     const [users, count] = await query.getManyAndCount();
-    
-    console.log("🚀 ~ UserService ~ findAll ~ users:", users)
+
+    console.log('🚀 ~ UserService ~ findAll ~ users:', users);
 
     return new PageDto(
       users,
@@ -121,5 +122,12 @@ export class UserService {
 
   async remove(id: number): Promise<void> {
     await this.repository.delete(id);
+  }
+
+  async countStudent(): Promise<number> {
+    const data = await this.repository.count({
+      where: { role: UserRole.STUDENT },
+    });
+    return data;
   }
 }

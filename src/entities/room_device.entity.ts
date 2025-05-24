@@ -24,7 +24,7 @@ export class RoomDevice {
   @JoinColumn({ name: 'room_id' })
   room: Room;
 
-  @Column()
+  @Column({ type: 'int' })
   device_id: number;
 
   @ManyToOne(() => Device, (device) => device.room_devices, {
