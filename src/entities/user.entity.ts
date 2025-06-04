@@ -7,7 +7,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { RoomStudent } from './room_student.entity';
 
 @Entity('user')
 export class User {
@@ -26,6 +28,15 @@ export class User {
   @Column({ type: 'varchar', length: 255 })
   password: string;
 
+  @Column({ type: 'varchar', length: 255 })
+  cccd_code: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  class_code: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  student_code: string;
+
   @Column({ type: 'varchar', length: 2000, nullable: true })
   token: string;
 
@@ -42,6 +53,9 @@ export class User {
     default: CommonStatus.ACTIVE,
   })
   status: CommonStatus;
+
+  @OneToMany(() => RoomStudent, (roomStudent) => roomStudent.user)
+  room_students: RoomStudent[];
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

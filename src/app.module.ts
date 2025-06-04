@@ -8,15 +8,16 @@ import { UploadModule } from '@modules/upload/upload.module';
 import { UserModule } from '@modules/user/user.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RoomDevice } from './entities/room_device.entity';
-import { Room } from './entities/room.entity';
 import { RoomDeviceModule } from '@modules/room_device/room_device.module';
 import { RoomPhoto } from './entities/room_photo.entity';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AdminDashboardModule } from './modules/admin-dashboard/admin-dashboard.module';
+import { RoomStudentModule } from '@modules/room_student/room_student.module';
+import { RenRoomModule } from '@modules/ren-room/ren-room.module';
+import { RentRoomModule } from '@modules/rent-room/rent-room.module';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -49,6 +50,9 @@ import { AdminDashboardModule } from './modules/admin-dashboard/admin-dashboard.
     RoomDeviceModule,
     RoomPhoto,
     AdminDashboardModule,
+    RoomStudentModule,
+    RenRoomModule,
+    RentRoomModule,
   ],
 })
 export class AppModule {}

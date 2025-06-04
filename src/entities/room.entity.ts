@@ -15,6 +15,7 @@ import { RoomType } from './room_type.entity';
 import { RoomDevice } from './room_device.entity';
 import { RoomStatus } from '../modules/room/types/room.type';
 import { RoomPhoto } from './room_photo.entity';
+import { RoomStudent } from './room_student.entity';
 
 @Entity()
 export class Room {
@@ -56,6 +57,11 @@ export class Room {
 
   @OneToMany(() => RoomPhoto, (roomPhoto) => roomPhoto.room, { eager: true })
   room_photos: RoomPhoto[];
+
+  @OneToMany(() => RoomStudent, (roomStudent) => roomStudent.room, {
+    eager: true,
+  })
+  room_students: RoomStudent[];
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

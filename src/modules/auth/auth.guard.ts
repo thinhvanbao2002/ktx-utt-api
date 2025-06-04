@@ -10,8 +10,8 @@ import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private jwtService: JwtService,
     private reflector: Reflector,
+    private jwtService: JwtService,
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
@@ -24,12 +24,20 @@ export class AuthGuard implements CanActivate {
     }
 
     const token = authHeader.split(' ')[1];
+    
     try {
       const decoded = this.jwtService.verify(token);
-      request.user = decoded;
+      
+      request.user = {
+        id: decoded.id,
+        name: decoded.name,
+        role: decoded.role
+      };
+      
       if (roles && !roles.includes(decoded.role)) {
         throw new UnauthorizedException('You do not have permission');
       }
+      
       return true;
     } catch (error) {
       throw new UnauthorizedException('Invalid token');

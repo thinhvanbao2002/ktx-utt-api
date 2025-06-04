@@ -48,7 +48,10 @@ export class RoomService {
       .leftJoinAndSelect('room.room_type', 'room_type')
       .leftJoinAndSelect('room.room_devices', 'room_devices')
       .leftJoinAndSelect('room_devices.device', 'device')
-      .leftJoinAndSelect('room.room_photos', 'room_photos') // 👈 Join thêm ảnh
+      .leftJoinAndSelect('room.room_photos', 'room_photos')
+      .leftJoinAndSelect('room.room_students', 'room_student')
+      .leftJoinAndSelect('room_student.user', 'user')
+
       .select([
         'room.id',
         'room.room_number',
@@ -74,9 +77,20 @@ export class RoomService {
         'device.device_code',
         'device.name',
 
-        'room_photos.id', // 👈 Các trường cần lấy từ room_photos
+        'room_photos.id',
         'room_photos.url',
         'room_photos.created_at',
+
+        // 👇 Các trường user bạn muốn lấy
+        'room_student.id',
+        'room_student.room_id',
+        'room_student.user_id',
+
+        'user.id',
+        'user.name',
+        'user.phone',
+        'user.email',
+        'user.role',
       ]);
 
     // Search by keyword
@@ -130,7 +144,7 @@ export class RoomService {
   async findOne(id: number): Promise<Room> {
     const room = await this.repository.findOne({
       where: { id },
-      relations: ['building'],
+      relations: ['building','room_type'],
     });
 
     if (!room) {
@@ -142,7 +156,7 @@ export class RoomService {
 
   async create(dto: CreateRoomDto): Promise<Room> {
     const { devices, room_photos, ...roomData } = dto;
-    console.log("🚀 ~ RoomService ~ create ~ dto:", dto)
+    console.log('🚀 ~ RoomService ~ create ~ dto:', dto);
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -187,7 +201,7 @@ export class RoomService {
   async update(id: number, data: UpdateRoomDto): Promise<Room> {
     const { devices, room_photos, ...roomData } = data;
 
-    const updated_photos = room_photos.map((photo: {url: string}) => ({
+    const updated_photos = room_photos.map((photo: { url: string }) => ({
       ...photo,
       url: photo.url.replace(`${process.env.API_BASE_URL}/`, ''),
     }));
@@ -205,9 +219,10 @@ export class RoomService {
       // 2. Xử lý devices
       if (devices) {
         // Lấy danh sách RoomDevice hiện có của room
-        const existingRoomDevices: RoomDevice[] = await this.roomDeviceRepository.find({
-          where: { room_id: id },
-        });
+        const existingRoomDevices: RoomDevice[] =
+          await this.roomDeviceRepository.find({
+            where: { room_id: id },
+          });
 
         const existingDeviceIds = new Set(
           existingRoomDevices.map((rd: any) => rd.device_id),
@@ -245,7 +260,7 @@ export class RoomService {
           updated_photos.map((photo) => ({
             room_id: id,
             url: photo.url,
-          }))
+          })),
         );
         await queryRunner.manager.save(RoomPhoto, newRoomPhotos);
       }

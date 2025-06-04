@@ -33,7 +33,15 @@ export class AuthController {
   @Get('/getUserInfo')
   @Roles(UserRole.ADMIN, UserRole.STUDENT)
   @UseGuards(AuthGuard)
-  async getUserInfo(@Body() dto: RegisterDto, @Request() req) {
+  async getUserInfo(@Request() req) {
+    const user = req.user;
+    return await this.authService.getUserInfo(user);
+  }
+
+  @Get('/getMyRequest')
+  @Roles(UserRole.ADMIN, UserRole.STUDENT)
+  @UseGuards(AuthGuard)
+  async getMyRequest(@Request() req) {
     const user = req.user;
     return await this.authService.getUserInfo(user);
   }

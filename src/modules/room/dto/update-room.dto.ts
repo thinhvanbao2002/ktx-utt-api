@@ -9,7 +9,7 @@ export class UpdateRoomDto {
   @StringField()
   room_number: string;
 
-  @NumberField()
+  @NumberField()  
   building_id: number;
 
   @NumberField()
