@@ -73,7 +73,12 @@ export class RentRoomController {
     return this.rentRoomService.triggerWorkFlow(dto);
   }
 
-
+  @Post(':id/terminate')
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN)
+  terminateContract(@Param('id') id: string): Promise<RentRoom> {
+    return this.rentRoomService.terminateContract(+id);
+  }
 
   // @Put(':id/status')
   // updateStatus(

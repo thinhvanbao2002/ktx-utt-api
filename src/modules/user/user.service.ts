@@ -40,6 +40,9 @@ export class UserService {
         'user.phone',
         'user.role',
         'user.status',
+        'user.cccd_code',
+        'user.class_code',
+        'user.student_code',
         'user.created_at',
       ]);
 

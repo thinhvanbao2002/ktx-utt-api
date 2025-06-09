@@ -4,4 +4,5 @@ export enum RentRoomStatus {
   CONFIRMED = 'confirmed',
   CONTRACT_SIGNED = 'contractSigned',
   COMPLETED = 'completed',
+  TERMINATED = 'terminated',
 }

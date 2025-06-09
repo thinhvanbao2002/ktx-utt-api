@@ -7,9 +7,9 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Room } from './room.entity';
 import { User } from './user.entity';
 import { RentRoomStatus } from '../modules/ren-room/types/rent-room.type';
+import { Room } from './room.entity';
 
 
 @Entity('rent_rooms')
