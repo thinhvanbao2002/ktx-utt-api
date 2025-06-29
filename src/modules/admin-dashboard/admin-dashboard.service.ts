@@ -6,6 +6,9 @@ import { Repository } from 'typeorm';
 import { User } from 'src/entities/user.entity';
 import { UserRole } from 'src/types/user.types';
 import { Room } from 'src/entities/room.entity';
+import { RentRoom } from 'src/entities/rent_room.entity';
+import { Between } from 'typeorm';
+import { RentRoomStatus } from '../ren-room/types/rent-room.type';
 
 @Injectable()
 export class AdminDashboardService {
@@ -14,6 +17,8 @@ export class AdminDashboardService {
     private repository: Repository<User>,
     @InjectRepository(Room)
     private roomRepository: Repository<Room>,
+    @InjectRepository(RentRoom)
+    private rentRoomRepository: Repository<RentRoom>,
   ) {}
 
   async getDataDashboard() {
@@ -22,9 +27,13 @@ export class AdminDashboardService {
     });
 
     const roomCount = await this.roomRepository.count();
+    const countCategories = await this.rentRoomRepository.count({
+      where: { status: RentRoomStatus.DRAFT },
+    });
     return {
       student: studentCount,
       room: roomCount,
+      countCategories,
     };
   }
 
@@ -42,5 +51,20 @@ export class AdminDashboardService {
 
   remove(id: number) {
     return `This action removes a #${id} adminDashboard`;
+  }
+
+  async getStudentRegisterStatistics(year: number) {
+    const results = [];
+    for (let month = 1; month <= 12; month++) {
+      const start = new Date(year, month - 1, 1);
+      const end = new Date(year, month, 0, 23, 59, 59, 999);
+      const count = await this.rentRoomRepository.count({
+        where: {
+          created_at: Between(start, end),
+        },
+      });
+      results.push({ month, count });
+    }
+    return results;
   }
 }

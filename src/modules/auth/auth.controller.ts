@@ -30,6 +30,12 @@ export class AuthController {
   async register(@Body() dto: RegisterDto) {
     return await this.authService.register(dto);
   }
+
+  @Post('/register')
+  async registerNew(@Body() dto: RegisterDto) {
+    return await this.authService.register(dto);
+  }
+
   @Get('/getUserInfo')
   @Roles(UserRole.ADMIN, UserRole.STUDENT)
   @UseGuards(AuthGuard)

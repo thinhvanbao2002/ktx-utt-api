@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { AdminDashboardService } from './admin-dashboard.service';
 import { CreateAdminDashboardDto } from './dto/create-admin-dashboard.dto';
@@ -19,6 +20,12 @@ export class AdminDashboardController {
   @Post()
   getDataDashboard() {
     return this.adminDashboardService.getDataDashboard();
+  }
+
+  @Get('student-register-statistics')
+  async getStudentRegisterStatistics(@Query('year') year: string) {
+    const y = parseInt(year) || new Date().getFullYear();
+    return this.adminDashboardService.getStudentRegisterStatistics(y);
   }
 
   @Get()
@@ -43,4 +50,6 @@ export class AdminDashboardController {
   remove(@Param('id') id: string) {
     return this.adminDashboardService.remove(+id);
   }
+
+
 }

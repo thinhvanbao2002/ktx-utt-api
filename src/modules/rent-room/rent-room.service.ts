@@ -55,15 +55,40 @@ export class RentRoomService {
   }
 
   async findAllRentRoom(dto: FilterRentRoomDto, req: any): Promise<PageDto<RentRoom>> {
-    console.log("🚀 ~ RentRoomService ~ findAllRentRoom ~ req:", req.user)
     const queryBuilder = this.rentRoomRepository.createQueryBuilder('rentRoom')
       .leftJoinAndSelect('rentRoom.room', 'room')
       .leftJoinAndSelect('rentRoom.user', 'user');
 
-    // If user is not admin, only show their records
+    // Nếu không phải admin thì chỉ lấy bản ghi của user đó
     if (req.user.role !== UserRole.ADMIN) {
       queryBuilder.where('rentRoom.user_id = :userId', { userId: req.user.id });
+    } else {
+      queryBuilder.where('1=1');
     }
+
+    // Lọc theo mã phòng hoặc mã sinh viên
+    if (dto.q) {
+      queryBuilder.andWhere(
+        '(room.room_number LIKE :q OR user.student_code LIKE :q)',
+        { q: `%${dto.q}%` }
+      );
+    }
+
+    // Lọc theo trạng thái
+    if (dto.status) {
+      queryBuilder.andWhere('rentRoom.status = :status', { status: dto.status });
+    }
+
+    // Lọc theo ngày tạo
+    if (dto.from_date) {
+      queryBuilder.andWhere('rentRoom.created_at >= :from_date', { from_date: dto.from_date });
+    }
+    if (dto.to_date) {
+      queryBuilder.andWhere('rentRoom.created_at <= :to_date', { to_date: dto.to_date });
+    }
+
+    // Phân trang
+    queryBuilder.skip(dto.skip).take(dto.take);
 
     const [rentRooms, count] = await queryBuilder.getManyAndCount();
 

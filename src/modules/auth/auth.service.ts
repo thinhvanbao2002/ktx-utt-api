@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.dto';
+import { UserRole } from '../user/types/user.type';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,9 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const { phone, password } = dto;
+
+    console.log('---- PASS ----',password);
+    
 
     const findUser = await this.userRepository.findOne({
       where: { phone: phone },
@@ -70,9 +74,13 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(dto.password, SALT);
 
-    dto.password = passwordHash;
+    const userData = {
+      ...dto,
+      password: passwordHash,
+      role: UserRole.STUDENT
+    };
 
-    return await this.userRepository.save(dto);
+    return await this.userRepository.save(userData);
   }
 
   async getUserInfo(user) {
