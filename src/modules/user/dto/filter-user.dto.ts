@@ -23,4 +23,10 @@ export class FilterUserDto extends PageOptionsDto {
 
   @EnumFieldOptional(() => CommonStatus)
   status: CommonStatus;
+
+  @EnumFieldOptional(() => UserRole)
+  role: UserRole;
+
+  @StringFieldOptional()
+  hometown?: string;
 }

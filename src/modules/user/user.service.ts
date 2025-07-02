@@ -26,6 +26,7 @@ export class UserService {
 
   async findAll(@Query() dto: FilterUserDto): Promise<PageDto<User>> {
     const { take, skip: skipRaw, q, status, from_date, to_date, page } = dto;
+    console.log('🚀 ~ UserService ~ findAll ~ dto:', dto);
 
     const pageNumber = parseInt(page as any, 10) || 1;
     const itemsPerPage = parseInt(take as any, 10) || 10;
@@ -44,6 +45,7 @@ export class UserService {
         'user.class_code',
         'user.student_code',
         'user.created_at',
+        'user.hometown',
       ]);
 
     // Tìm kiếm theo từ khóa (q)
@@ -74,6 +76,11 @@ export class UserService {
       query.andWhere('user.created_at <= :toDate', { toDate: toDateEnd });
     }
 
+    // Filter theo role
+    if (dto.role) {
+      query.andWhere('user.role = :role', { role: dto.role });
+    }
+
     query.skip(skip).take(itemsPerPage);
 
     const [users, count] = await query.getManyAndCount();
@@ -91,7 +98,7 @@ export class UserService {
   }
 
   async create(dto: CreateUserDto): Promise<User> {
-    const { phone, email } = dto;
+    const { phone, email, hometown } = dto;
 
     const checkPhone = await this.repository.findOne({
       where: { phone },

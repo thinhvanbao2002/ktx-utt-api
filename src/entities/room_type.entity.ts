@@ -9,6 +9,11 @@ import {
 } from 'typeorm';
 import { Room } from './room.entity';
 
+export enum RoomGender {
+  MALE = 'male',
+  FEMALE = 'female',
+}
+
 @Entity()
 export class RoomType {
   @PrimaryGeneratedColumn()
@@ -22,6 +27,9 @@ export class RoomType {
 
   @Column({ type: 'int' })
   max_student: number;
+
+  @Column({ type: 'enum', enum: RoomGender, default: RoomGender.MALE })
+  gender: RoomGender;
 
   @OneToMany(() => Room, room => room.room_type_id)
   rooms: Room[];

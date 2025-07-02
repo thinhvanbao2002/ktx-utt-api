@@ -19,4 +19,13 @@ export class CreateUserDto {
 
   @StringField()
   password: string;
+
+  @StringFieldOptional()
+  hometown?: string;
+
+  @StringFieldOptional()
+  class_code?: string;
+
+  @StringFieldOptional()
+  student_code?: string;
 }

@@ -31,10 +31,10 @@ export class User {
   @Column({ type: 'varchar', length: 255 })
   cccd_code: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   class_code: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   student_code: string;
 
   @Column({ type: 'varchar', length: 2000, nullable: true })
@@ -53,6 +53,9 @@ export class User {
     default: CommonStatus.ACTIVE,
   })
   status: CommonStatus;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  hometown?: string;
 
   @OneToMany(() => RoomStudent, (roomStudent) => roomStudent.user)
   room_students: RoomStudent[];

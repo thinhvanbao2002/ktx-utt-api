@@ -18,6 +18,7 @@ import { RoomStudentModule } from '@modules/room_student/room_student.module';
 import { RenRoomModule } from '@modules/ren-room/ren-room.module';
 import { RentRoomModule } from '@modules/rent-room/rent-room.module';
 import { JwtService } from '@nestjs/jwt';
+import { ClaimModule } from '@modules/claim/claim.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { JwtService } from '@nestjs/jwt';
     RoomStudentModule,
     RenRoomModule,
     RentRoomModule,
+    ClaimModule
   ],
 })
 export class AppModule {}
