@@ -9,6 +9,7 @@ import { Room } from 'src/entities/room.entity';
 import { RentRoom } from 'src/entities/rent_room.entity';
 import { Between } from 'typeorm';
 import { RentRoomStatus } from '../ren-room/types/rent-room.type';
+import { Claim, ClaimStatus } from 'src/entities/claim.entity';
 
 @Injectable()
 export class AdminDashboardService {
@@ -19,6 +20,8 @@ export class AdminDashboardService {
     private roomRepository: Repository<Room>,
     @InjectRepository(RentRoom)
     private rentRoomRepository: Repository<RentRoom>,
+    @InjectRepository(Claim)
+    private claimRepository: Repository<Claim>,
   ) {}
 
   async getDataDashboard() {
@@ -30,10 +33,14 @@ export class AdminDashboardService {
     const countCategories = await this.rentRoomRepository.count({
       where: { status: RentRoomStatus.DRAFT },
     });
+    const countClaim = await this.claimRepository.count({
+      where: { status: ClaimStatus.PENDING},
+    })
     return {
       student: studentCount,
       room: roomCount,
       countCategories,
+      claim: countClaim
     };
   }
 
